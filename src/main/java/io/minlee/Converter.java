@@ -11,14 +11,22 @@ public class Converter {
     static String[] tensStrings = {"", "","Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"};
 
     public static String convertToSpeak(String input){
+        StringBuilder result = new StringBuilder();
         if(input.length() >= 7)
-            return convertMillions(input);
+            result.append(convertMillions(input));
         else if((input.length() <= 6) && (input.length() >= 4))
-            return convertThousands(input);
+            result.append(convertThousands(input));
         else if(input.length() == 3)
-            return convertHundreds(input);
+            result.append(convertHundreds(input));
         else
-            return convertTens(input);
+            result.append(convertTens(input));
+        if(result.toString().equals("One"))
+            result.append("Dollar");
+        else
+            result.append("Dollars");
+        return result.toString();
+
+
     }
     public static String convertMillions(String input) {
         StringBuilder result = new StringBuilder();
@@ -68,14 +76,19 @@ public class Converter {
 
     public static String convertTens(String input){
         StringBuilder result = new StringBuilder();
-        int tensDigit =  Integer.parseInt(input.substring(0,1));
-        int onesDigit =  Integer.parseInt(input.substring(1,2));
-        if(tensDigit > 1){
-            result.append(tensStrings[tensDigit]);
-            result.append(twentyAndUnderStrings[onesDigit]);
+        if(input.length() > 1){
+            int tensDigit =  Integer.parseInt(input.substring(0,1));
+            int onesDigit =  Integer.parseInt(input.substring(1,2));
+            if(tensDigit > 1){
+                result.append(tensStrings[tensDigit]);
+                result.append(twentyAndUnderStrings[onesDigit]);
+            }
+            else
+                result.append(twentyAndUnderStrings[tensDigit*10+onesDigit]);
         }
-        else
-            result.append(twentyAndUnderStrings[tensDigit*10+onesDigit]);
+        else {
+            result.append(twentyAndUnderStrings[Integer.parseInt(input)]);
+        }
         return result.toString();
     }
 
