@@ -106,4 +106,11 @@ public class AppTests {
         String actualValue = Converter.convertToSpeak(test);
         assertEquals(expectedValue,actualValue);
     }
+    @Test
+    public void test0(){
+        String test = "0";
+        String expectedValue = "ZeroDollars";
+        String actualValue = Converter.convertToSpeak(test);
+        assertEquals(expectedValue,actualValue);
+    }
 }

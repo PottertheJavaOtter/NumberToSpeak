@@ -87,7 +87,12 @@ public class Converter {
                 result.append(twentyAndUnderStrings[tensDigit*10+onesDigit]);
         }
         else {
-            result.append(twentyAndUnderStrings[Integer.parseInt(input)]);
+            int onesDigit =  Integer.parseInt(input);
+            if(onesDigit == 0){
+                result.append("Zero");
+            }
+            else
+                result.append(twentyAndUnderStrings[onesDigit]);
         }
         return result.toString();
     }
