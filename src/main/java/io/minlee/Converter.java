@@ -5,97 +5,66 @@ package io.minlee;
  */
 public class Converter {
 
-    static String[] twentyAndUnderStrings= {"","One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten",
-            "Eleven", "Twelve","Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen",
-            "Eighteen", "Nineteen", "Twenty"};
-    static String[] tensStrings = {"", "","Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"};
+    private Decoder decoder;
+    private String[] splitIntoThreesArray;
 
-    public static String convertToSpeak(String input){
-        StringBuilder result = new StringBuilder();
-        if(input.length() >= 7)
-            result.append(convertMillions(input));
-        else if((input.length() <= 6) && (input.length() >= 4))
-            result.append(convertThousands(input));
-        else if(input.length() == 3)
-            result.append(convertHundreds(input));
+    public Converter(){
+        decoder = new Decoder();
+    }
+
+    public String convertToSpeak(String input){
+        DigitsBreaker digitsBreaker = new DigitsBreaker(input);
+        splitIntoThreesArray = digitsBreaker.getStringArray();
+        if(input.equals("0"))
+            decoder.decodeZero();
+        else {
+           solveValueNotEqualToZero();
+        }
+        decoder.decodeDollars();
+        return decoder.toString();
+    }
+
+    private void solveValueNotEqualToZero(){
+        if(splitIntoThreesArray.length == 3){
+            solveThreeSetsOfDigits();
+        }
+        else if(splitIntoThreesArray.length == 2){
+            solveTwoSetsOfDigits();;
+        }
         else
-            result.append(convertTens(input));
-        if(result.toString().equals("One"))
-            result.append("Dollar");
+            solveThreeDigits(splitIntoThreesArray[0]);
+    }
+
+    private void solveTwoSetsOfDigits(){
+        solveThousands(splitIntoThreesArray[0]);
+        solveThreeDigits(splitIntoThreesArray[1]);
+    }
+
+    private void solveThreeSetsOfDigits(){
+        solveMillions(splitIntoThreesArray[0]);
+        solveThousands(splitIntoThreesArray[1]);
+        solveThreeDigits(splitIntoThreesArray[2]);
+    }
+
+    private void solveMillions(String input){
+        solveThreeDigits(input);
+        decoder.decodeMillion();
+    }
+
+    private void solveThousands(String input){
+        if(!input.equals("000")){
+            solveThreeDigits(input);
+            decoder.decodeThousand();
+        }
+    }
+
+    private void solveThreeDigits(String input){
+        if(input.length() == 3){
+            decoder.decodeHundredsPlaces(input.substring(0,1));
+            decoder.decodeTensPlaces(input.substring(1,3));
+        }
         else
-            result.append("Dollars");
-        return result.toString();
-
-
+            decoder.decodeTensPlaces(input);
     }
-    public static String convertMillions(String input) {
-        StringBuilder result = new StringBuilder();
-        if(input.length() == 9){
-            result.append(convertHundreds(input.substring(0,3))+"Million");
-            result.append(convertThousands(input.substring(3,9)));
-        }
-        else if(input.length() == 8){
-            result.append(convertTens(input.substring(0,2))+"Million");
-            result.append(convertThousands(input.substring(2,8)));
-
-        }
-        else {
-            result.append(twentyAndUnderStrings[Integer.parseInt(input.substring(0, 1))] + "Million");
-            result.append(convertThousands(input.substring(1, 7)));
-        }
-        return result.toString();
-    }
-    public static String convertThousands(String input) {
-        StringBuilder result = new StringBuilder();
-        if(input.length() == 6){
-            if(!(convertHundreds(input.substring(0,3)).equals("")))
-                result.append(convertHundreds(input.substring(0,3))+"Thousand");
-            result.append(convertHundreds(input.substring(3,6)));
-        }
-        else if(input.length() == 5){
-            result.append(convertTens(input.substring(0,2))+"Thousand");
-            result.append(convertHundreds(input.substring(2,5)));
-
-        }
-        else {
-            result.append(twentyAndUnderStrings[Integer.parseInt(input.substring(0, 1))] + "Thousand");
-            result.append(convertHundreds(input.substring(1, 4)));
-        }
-        return result.toString();
-    }
-    public static String convertHundreds(String input) {
-        StringBuilder result = new StringBuilder();
-        int hundredDigit =  Integer.parseInt(input.substring(0,1));
-        result.append(twentyAndUnderStrings[hundredDigit]);
-        if(!(hundredDigit == 0))
-            result.append("Hundred");
-        result.append(convertTens(input.substring(1,3)));
-        return result.toString();
-    }
-
-
-    public static String convertTens(String input){
-        StringBuilder result = new StringBuilder();
-        if(input.length() > 1){
-            int tensDigit =  Integer.parseInt(input.substring(0,1));
-            int onesDigit =  Integer.parseInt(input.substring(1,2));
-            if(tensDigit > 1){
-                result.append(tensStrings[tensDigit]);
-                result.append(twentyAndUnderStrings[onesDigit]);
-            }
-            else
-                result.append(twentyAndUnderStrings[tensDigit*10+onesDigit]);
-        }
-        else {
-            int onesDigit =  Integer.parseInt(input);
-            if(onesDigit == 0){
-                result.append("Zero");
-            }
-            else
-                result.append(twentyAndUnderStrings[onesDigit]);
-        }
-        return result.toString();
-    }
-
 
 }
